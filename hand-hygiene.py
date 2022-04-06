@@ -10,6 +10,8 @@ import pygame as pg
 import RPi.GPIO as GPIO
 import sys
 
+GPIO.setmode(GPIO.BCM)
+
 class OLED: # handles use of the OLED display (we have not received the part yet; fill in library after specific part is received)
     def __init__(self):
         self.display = None
@@ -43,7 +45,7 @@ class FlowSensor: # handles use of the water flow sensor
 
         water_flow_pin = 4 # output of water flow sensor is BCM4
 
-        GPIO.setmode(GPIO.BCM)
+        
         GPIO.setup(water_flow_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
     def detect_water_flow_sensor(self): 
@@ -61,7 +63,7 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
         return
 
     def setup_fan(self):
-        GPIO.setmode(GPIO.BCM)
+        
         global fan_pin
 
         fan_pin = 18 # fan output is BCM18; change as needed
@@ -75,7 +77,7 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
         GPIO.output(fan_pin, False)
 
     def setup_servo(self):
-        GPIO.setmode(GPIO.BCM)
+        
         global servo_pin
         global servo
         servo = GPIO.PWM(servo_pin, 50)
@@ -99,14 +101,14 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
     def stop_bubbles(self):
         stop_fan()
         stop_servo()
-        
+
 class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor 
     def __init__(self):
         # TODO
         return
 
     def setup_captouch(): # only using three touch sensors (power on/off, select, scroll)
-        GPIO.setmode(GPIO.BCM)
+        
         global out0
         global out1
         global out2
