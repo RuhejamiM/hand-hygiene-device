@@ -75,7 +75,7 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
     def clear_display(self):
         draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0)) # clear display by sending black rectangle 
         disp.image(image)
-
+"""
     def image_to_display(self, imgfile)
         image = Image.open(imgfile)
 
@@ -102,7 +102,7 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
     def text_to_display(self, message):
         # TODO
         return
-
+"""
 class FlowSensor: # handles use of the water flow sensor
 
     def __init__(self):
