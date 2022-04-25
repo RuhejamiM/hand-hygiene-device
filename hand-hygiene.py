@@ -22,7 +22,7 @@ servo_pin = 23 # servo output is BCM23; change as needed
 
 # change pin numbers as needed (these are for the capacitive touch input:)
 out0 = 26 # output 0 is BCM26
-out1 = 19 # output 1 is BCM19
+out1 = 6 # output 1 is BCM6 (if BCM19, it conflicts with the speaker breakout)
 out2 = 13 # output 2 is BCM13
 
 flow_count = 0 # keep track of water flow count
