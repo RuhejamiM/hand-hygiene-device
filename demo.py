@@ -38,18 +38,18 @@ ct = CapTouch() # initialize capacitive touch object
 
 ct.setup_captouch()
 
-print("Now testing capacitive touch sensor input. Follow the prompts or press Ctrl + C to skip.")
-
-ct.detect_captouch()
+print("Now testing capacitive touch sensor input. Press Ctrl + C to skip.")
 
 try:
-	while not GPIO.event_detected(ct.out0):
-		print("Touch the first capacitive input")
-	while not GPIO.event_detected(ct.out1):
-		print("Touch the second capacitive input")
-	while not GPIO.event_detected(ct.out2):
-		print("Touch the third/last capacitive input")
-	print("Success. All capacitive inputs are working.")
+	ct_end = time.time() + 10
+	ct.detect_captouch()
+	print("Test all of the capacitive inputs by triggering them. The input that is triggered will be displayed.")
+
+	while(time.time() < ct_end):
+		time.sleep(.005)
+	
+	print("Check if all touches have registered. Continuing to next test in 5 seconds...")
+	time.sleep(5)
 except KeyboardInterrupt:
 	print("Ctrl + C was pressed. Terminating capacitive touch test and continuing...")
 
@@ -77,23 +77,25 @@ Flow Sensor Tests
 fs = FlowSensor() # initialize flow sensor object
 
 fs.setup_water_flow_sensor()
-
-print("Now testing the flow sensor. This will start a counter from 0 and increase if water is flowing, else it will stay constant. Press Ctrl + C to skip.")
-time.sleep(3)
-
-flowcount = 0
+print("Now testing the flow sensor. This will take about 5 seconds. Press Ctrl + C to skip.")
 
 try:
-	flow_end = time.time() + 10
-	while time.time() < flow_end:
-		fc2 = flowcount
-		time.sleep(0.25)
-		if(flowcount == fc2):
-			print("No water flow detected.")
-		else:
-			print("Water flow detected.")
-		print("Current flow count: ", flowcount)
+	fs.detect_water_flow_sensor()
+	if fs.flow_count > 2: # adjust flow count detection threshold as needed
+		print("Water flow has been detected.")
+	else:
+		print("No water flow detected.")
+	print("Final flow count: ", fs.flow_count)
 except KeyboardInterrupt:
 	print("Ctrl + C was pressed. Terminating flow sensor test and continuing...")
 
+"""
+LCD Tests
+"""
+
+lcd1 = LCD() # initialize LCD object
+
+lcd1.setup_display()
+
+#TODO: add remaining LCD test
 

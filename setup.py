@@ -6,6 +6,6 @@ setup(name='hand-hygiene',
       author='Ethan Bonpin and Ruhejami Mustari',
       author_email=['eb3326@nyu.edu', 'rm4966@nyu.edu']
       url='https://github.com/RuhejamiM/hand-hygiene-device',
-      install_requires=['pygame>=2.1.2'],
+      install_requires=['pygame>=2.1.2', 'adafruit-circuitpython-rgb-display', 'fonts-dejavu', 'python3-pil'],
 	  py_modules=['hand-hygiene'],
      )
