@@ -180,7 +180,7 @@ class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor
         # TODO
         return
 
-    def setup_captouch(): # only using three touch sensors (power on/off, select, scroll)
+    def setup_captouch(self): # only using three touch sensors (power on/off, select, scroll)
         
         global out0
         global out1
@@ -190,23 +190,23 @@ class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor
         GPIO.setup(out1, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         GPIO.setup(out2, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
-    def out0_cb(): # handle touch detection on first capacitive input
+    def out0_cb(self): # handle touch detection on first capacitive input
         print("First capacitive input touch detected")
 
-    def out1_cb(): # handle touch detection on second capacitive input
+    def out1_cb(self): # handle touch detection on second capacitive input
         print("Second capacitive input touch detected")
 
-    def out2_cb(): # handle touch detection on third capacitive input
+    def out2_cb(self): # handle touch detection on third capacitive input
         print("Third capacitive input touch detected")
 
-    def detect_captouch(): # detect falling edge (input touched)
+    def detect_captouch(self): # detect falling edge (input touched)
         GPIO.add_event_detect(out0, GPIO.FALLING,  bouncetime = 200, callback = out0_cb) # add bouncetime to prevent false alarm
         GPIO.add_event_detect(out1, GPIO.FALLING,  bouncetime = 200, callback = out1_cb)
         GPIO.add_event_detect(out2, GPIO.FALLING,  bouncetime = 200, callback = out2_cb)
 
 
 class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
-    def __init__(self, freq=44100, bitsize=-16, channels=2, buffer=2048):
+    def __init__(self, freq=32000, bitsize=-16, channels=2, buffer=2048): # note: change the frequency to match the frequency of the audio file to be played
         """
         initialize the speaker module
         freq: audio CD quality
