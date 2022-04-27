@@ -16,6 +16,15 @@ global lcd_cs_pin
 global lcd_dc_pin
 global lcd_reset_pin
 
+import time
+import pygame as pg
+import RPi.GPIO as GPIO
+import sys
+import digitalio
+import board
+from PIL import Image, ImageDraw
+from adafruit_rgb_display import st7735
+
 water_flow_pin = 4 # output of water flow sensor is BCM4
 fan_pin = 18 # fan output is BCM18; change as needed
 servo_pin = 23 # servo output is BCM23; change as needed
@@ -30,15 +39,6 @@ flow_count = 0 # keep track of water flow count
 lcd_cs_pin = digitalio.DigitalInOut(board.CE0) # LCD CS pin is CE0/BCM8; LCD uses SPI communication
 lcd_dc_pin = digitalio.DigitalInOut(board.D25) # LCD DC pin is D25/BCM25; this can be changed as needed
 lcd_reset_pin = digitalio.DigitalInOut(board.D24) # LCD reset pin is D24/BCM24; this can be changed as needed
-
-import time
-import pygame as pg
-import RPi.GPIO as GPIO
-import sys
-import digitalio
-import board
-from PIL import Image, ImageDraw
-from adafruit_rgb_display import st7735
 
 GPIO.setmode(GPIO.BCM)
 

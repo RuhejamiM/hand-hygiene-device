@@ -7,7 +7,7 @@ Tests the libraries implemented in hand-hygiene.py
 import time
 import sys
 import RPi.GPIO as GPIO
-from hand-hygiene import LCD, FlowSensor, Bubbles, CapTouch, Speaker
+from hand_hygiene import LCD, FlowSensor, Bubbles, CapTouch, Speaker
 
 
 """
