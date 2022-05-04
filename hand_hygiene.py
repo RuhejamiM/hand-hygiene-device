@@ -129,7 +129,7 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
         draw.rectangle((0, 0, width, height), fill=(252, 186, 3))
         disp.image(image)
 
-        # Draw a smaller inner purple rectangle
+        # Draw a smaller inner rectangle
         draw.rectangle((BORDER, BORDER, width - BORDER - 1, height - BORDER - 1), fill=(111, 186, 252))
  
         # Load a TTF Font
@@ -156,6 +156,7 @@ class FlowSensor: # handles use of the water flow sensor
 
         if not GPIO.input(water_flow_pin):
             flow_count += 1
+        print("Water Flow Sensor Turns: " + str(flow_count))
 
     def detect_water_flow_sensor(self): 
         global flow_count
@@ -167,7 +168,7 @@ class FlowSensor: # handles use of the water flow sensor
         while time.time() < flow_end:
             time.sleep(.05) # slight delay before checking for flow again
 
-        return flow_count # return flow count after 5 seconds of checking
+        print("Final flow count: ", flow_count ) # return flow count after 5 seconds of checking
 
 class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble system
 
@@ -191,14 +192,18 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
         
         global servo_pin
         global servo
-        servo = GPIO.PWM(servo_pin, 50)
+        servo = GPIO.PWM(servo_pin, 10)
 
     def start_servo(self):
+        global servo
+        global servo_pin
         servo.start(0)
         duty = 0.05 # set duty cycle; change as needed
         servo.ChangeDutyCycle(duty)
 
     def stop_servo(self):
+        global servo
+        global servo_pin
         servo.stop()
 
     def setup_bubbles(self):
@@ -228,16 +233,19 @@ class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor
         GPIO.setup(out1, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         GPIO.setup(out2, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
-    def out0_cb(self): # handle touch detection on first capacitive input
+    def out0_cb(): # handle touch detection on first capacitive input
         print("First capacitive input touch detected")
 
-    def out1_cb(self): # handle touch detection on second capacitive input
+    def out1_cb(): # handle touch detection on second capacitive input
         print("Second capacitive input touch detected")
 
-    def out2_cb(self): # handle touch detection on third capacitive input
+    def out2_cb(): # handle touch detection on third capacitive input
         print("Third capacitive input touch detected")
 
     def detect_captouch(self): # detect falling edge (input touched)
+        global out0 
+        global out1
+        global out2
         GPIO.add_event_detect(out0, GPIO.FALLING, callback = out0_cb, bouncetime = 200) # add bouncetime to prevent false alarm
         GPIO.add_event_detect(out1, GPIO.FALLING, callback = out1_cb, bouncetime = 200)
         GPIO.add_event_detect(out2, GPIO.FALLING, callback = out2_cb, bouncetime = 200)
@@ -258,8 +266,8 @@ class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
         self.mixer.init(freq, bitsize, channels, buffer)
         pg.init()
 
-        # set volume to 20%
-        self.mixer.music.set_volume(0.2)
+        # set volume to 10%
+        self.mixer.music.set_volume(0.1)
 
         # pause status, stop is not paused, only pause will turn paused to True
         self.paused = False
