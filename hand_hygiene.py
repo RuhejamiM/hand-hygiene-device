@@ -16,13 +16,26 @@ global lcd_cs_pin
 global lcd_dc_pin
 global lcd_reset_pin
 
+global height
+global width
+
+global disp
+
+global BORDER
+global FONTSIZE
+
+global spi
+
 import time
 import pygame as pg
 import RPi.GPIO as GPIO
 import sys
+import os
+import time
+import busio
 import digitalio
 import board
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7735
 
 water_flow_pin = 4 # output of water flow sensor is BCM4
@@ -40,6 +53,10 @@ lcd_cs_pin = digitalio.DigitalInOut(board.CE0) # LCD CS pin is CE0/BCM8; LCD use
 lcd_dc_pin = digitalio.DigitalInOut(board.D25) # LCD DC pin is D25/BCM25; this can be changed as needed
 lcd_reset_pin = digitalio.DigitalInOut(board.D24) # LCD reset pin is D24/BCM24; this can be changed as needed
 
+BORDER = 5
+FONTSIZE = 14
+
+
 GPIO.setmode(GPIO.BCM)
 
 class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos (acc726@nyu.edu).
@@ -53,13 +70,18 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
         global lcd_dc_pin
         global lcd_reset_pin
 
-        backlight = digitalio.DigitalInOut(lcd_dc_pin) 
+        global height
+        global width
+        global disp
+        global spi
+
+        backlight = lcd_dc_pin 
         backlight.switch_to_output()
         backlight.value = True
         BAUDRATE = 24000000
         spi = board.SPI()
 
-        disp = st7735.ST7735R(spi, rotation = 270, cs = lcd_cs_pin, dc = lcd_dc_pin, st = lcd_reset_pin, baudrate = BAUDRATE) # change display rotation as needed
+        disp = st7735.ST7735R(spi, rotation = 0, cs = lcd_cs_pin, dc = lcd_dc_pin, rst = lcd_reset_pin, baudrate = BAUDRATE) # change display rotation as needed
 
         if disp.rotation % 180 == 90:
             height = disp.width  # we swap height/width to rotate it to landscape!
@@ -73,10 +95,12 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
         disp.image(image)
 
     def clear_display(self):
+        image = Image.new("RGB", (width, height))
+        draw = ImageDraw.Draw(image)
         draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0)) # clear display by sending black rectangle 
         disp.image(image)
-"""
-    def image_to_display(self, imgfile)
+
+    def image_to_display(self, imgfile):
         image = Image.open(imgfile)
 
         # Scale the image to the smaller screen dimension
@@ -100,9 +124,23 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
 
 
     def text_to_display(self, message):
-        # TODO
-        return
-"""
+        image = Image.new("RGB", (width, height))
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((0, 0, width, height), fill=(252, 186, 3))
+        disp.image(image)
+
+        # Draw a smaller inner purple rectangle
+        draw.rectangle((BORDER, BORDER, width - BORDER - 1, height - BORDER - 1), fill=(111, 186, 252))
+ 
+        # Load a TTF Font
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", FONTSIZE)
+ 
+        # Draw Some Text
+        text = message
+        (font_width, font_height) = font.getsize(text)
+        draw.text((width // 2 - font_width // 2, height // 2 - font_height // 2), text, font=font, fill=(0, 0, 0))
+        disp.image(image)
+
 class FlowSensor: # handles use of the water flow sensor
 
     def __init__(self):
@@ -200,13 +238,13 @@ class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor
         print("Third capacitive input touch detected")
 
     def detect_captouch(self): # detect falling edge (input touched)
-        GPIO.add_event_detect(out0, GPIO.FALLING,  bouncetime = 200, callback = out0_cb) # add bouncetime to prevent false alarm
-        GPIO.add_event_detect(out1, GPIO.FALLING,  bouncetime = 200, callback = out1_cb)
-        GPIO.add_event_detect(out2, GPIO.FALLING,  bouncetime = 200, callback = out2_cb)
+        GPIO.add_event_detect(out0, GPIO.FALLING, callback = out0_cb, bouncetime = 200) # add bouncetime to prevent false alarm
+        GPIO.add_event_detect(out1, GPIO.FALLING, callback = out1_cb, bouncetime = 200)
+        GPIO.add_event_detect(out2, GPIO.FALLING, callback = out2_cb, bouncetime = 200)
 
 
 class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
-    def __init__(self, freq=32000, bitsize=-16, channels=2, buffer=2048): # note: change the frequency to match the frequency of the audio file to be played
+    def __init__(self, freq=44100, bitsize=-16, channels=2, buffer=2048):
         """
         initialize the speaker module
         freq: audio CD quality
@@ -218,6 +256,7 @@ class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
         # initialize mixer (for playing sound)
         self.mixer = pg.mixer
         self.mixer.init(freq, bitsize, channels, buffer)
+        pg.init()
 
         # set volume to 20%
         self.mixer.music.set_volume(0.2)
