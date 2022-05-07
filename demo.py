@@ -13,8 +13,6 @@ from hand_hygiene import LCD, FlowSensor, Bubbles, CapTouch, Speaker
 
 GPIO.setmode(GPIO.BCM)
 
-c1 =  CapTouch()
-c1.setup_captouch()
 
 """
 Speaker Tests
