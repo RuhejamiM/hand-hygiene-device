@@ -39,7 +39,7 @@ from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7735
 
 water_flow_pin = 4 # output of water flow sensor is BCM4
-fan_pin = 18 # fan output is BCM18; change as needed
+fan_pin = 15 # fan output is BCM15 (Note: this has changed because BCM18 is already in use)
 servo_pin = 23 # servo output is BCM23; change as needed
 
 # change pin numbers as needed (these are for the capacitive touch input:)
@@ -151,23 +151,22 @@ class FlowSensor: # handles use of the water flow sensor
         global water_flow_pin
         GPIO.setup(water_flow_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
-    def water_flow_counter(self):
+    def water_flow_counter(self, pin):
         global flow_count
 
         if not GPIO.input(water_flow_pin):
             flow_count += 1
-        print("Water Flow Sensor Turns: " + str(flow_count))
 
     def detect_water_flow_sensor(self): 
         global flow_count
 
-        GPIO.add_event_detect(water_flow_pin, GPIO.FALLING, callback = water_flow_counter)
+        GPIO.add_event_detect(water_flow_pin, GPIO.FALLING, callback = self.water_flow_counter)
 
         flow_end = time.time() + 5 # check flow count for 5 seconds
 
         while time.time() < flow_end:
             time.sleep(.05) # slight delay before checking for flow again
-
+            print("Water flow sensor turns: " + str(flow_count))
         print("Final flow count: ", flow_count ) # return flow count after 5 seconds of checking
 
 class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble system
@@ -180,7 +179,7 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
         
         global fan_pin
 
-        GPIO.setup(fan_pin, GPIO.out)
+        GPIO.setup(fan_pin, GPIO.OUT)
 
     def start_fan(self):
         GPIO.output(fan_pin, True)
@@ -192,6 +191,7 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
         
         global servo_pin
         global servo
+        GPIO.setup(servo_pin, GPIO.OUT)
         servo = GPIO.PWM(servo_pin, 10)
 
     def start_servo(self):
@@ -233,23 +233,26 @@ class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor
         GPIO.setup(out1, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         GPIO.setup(out2, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
-    def out0_cb(): # handle touch detection on first capacitive input
+    def out0_cb(self, pin): # handle touch detection on first capacitive input
         print("First capacitive input touch detected")
 
-    def out1_cb(): # handle touch detection on second capacitive input
+    def out1_cb(self, pin): # handle touch detection on second capacitive input
         print("Second capacitive input touch detected")
 
-    def out2_cb(): # handle touch detection on third capacitive input
+    def out2_cb(self, pin): # handle touch detection on third capacitive input
         print("Third capacitive input touch detected")
 
     def detect_captouch(self): # detect falling edge (input touched)
         global out0 
         global out1
         global out2
-        GPIO.add_event_detect(out0, GPIO.FALLING, callback = out0_cb, bouncetime = 200) # add bouncetime to prevent false alarm
-        GPIO.add_event_detect(out1, GPIO.FALLING, callback = out1_cb, bouncetime = 200)
-        GPIO.add_event_detect(out2, GPIO.FALLING, callback = out2_cb, bouncetime = 200)
-
+        GPIO.add_event_detect(out0, GPIO.FALLING, callback = self.out0_cb, bouncetime = 200) # add bouncetime to prevent false alarm
+        GPIO.add_event_detect(out1, GPIO.FALLING, callback = self.out1_cb, bouncetime = 200)
+        GPIO.add_event_detect(out2, GPIO.FALLING, callback = self.out2_cb, bouncetime = 200)
+        
+        captouch_end = time.time() + 20
+        while time.time() < captouch_end:
+                time.sleep(.01)
 
 class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
     def __init__(self, freq=44100, bitsize=-16, channels=2, buffer=2048):
