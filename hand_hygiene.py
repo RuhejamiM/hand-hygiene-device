@@ -81,7 +81,7 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
         BAUDRATE = 24000000
         spi = board.SPI()
 
-        disp = st7735.ST7735R(spi, rotation = 0, cs = lcd_cs_pin, dc = lcd_dc_pin, rst = lcd_reset_pin, baudrate = BAUDRATE) # change display rotation as needed
+        disp = st7735.ST7735R(spi, rotation = 90, cs = lcd_cs_pin, dc = lcd_dc_pin, rst = lcd_reset_pin, baudrate = BAUDRATE) # change display rotation as needed
 
         if disp.rotation % 180 == 90:
             height = disp.width  # we swap height/width to rotate it to landscape!
@@ -93,6 +93,12 @@ class LCD: # handles use of the LCD display. Adapted from provided by Ale Campos
         draw = ImageDraw.Draw(image)
         draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0)) # clear display by sending black rectangle 
         disp.image(image)
+
+    def backlight_toggle(self):
+        if lcd_dc_pin.value is True:
+            lcd_dc_pin.value = False
+        else:
+            lcd_dc_pin.value = True
 
     def clear_display(self):
         image = Image.new("RGB", (width, height))
@@ -269,7 +275,7 @@ class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
         self.mixer.init(freq, bitsize, channels, buffer)
         pg.init()
 
-        # set volume to 10%
+        # set volume to 10% initially so the audio is not too loud
         self.mixer.music.set_volume(0.1)
 
         # pause status, stop is not paused, only pause will turn paused to True
@@ -370,5 +376,4 @@ class Speaker: # library provided by Jerry Wu (zw1711@nyu.edu)
     def __del__(self):
         pg.quit()
         
-def clean_gpio(): # when finished, clean GPIO pins to avoid unwanted behavior after program ends
-    GPIO.cleanup()
+
