@@ -207,16 +207,16 @@ class Bubbles: # handles use of the 5V fan/continuous rotation servo bubble syst
         servo.stop()
 
     def setup_bubbles(self):
-        setup_fan()
-        setup_servo()
+        self.setup_fan()
+        self.setup_servo()
     
     def start_bubbles(self):
-        start_fan()
-        start_servo()
+        self.start_fan()
+        self.start_servo()
 
     def stop_bubbles(self):
-        stop_fan()
-        stop_servo()
+        self.stop_fan()
+        self.stop_servo()
 
 class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor 
     def __init__(self):
