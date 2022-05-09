@@ -13,6 +13,8 @@ from hand_hygiene import LCD, FlowSensor, Bubbles, CapTouch, Speaker
 
 GPIO.setmode(GPIO.BCM)
 
+c1 =  CapTouch()
+c1.setup_captouch()
 
 """
 Speaker Tests
@@ -55,15 +57,6 @@ except KeyboardInterrupt:
 """
 Capacitive Tests
 """
-
-print("Now testing capacitive touch input for 20 seconds. Touch an input and the respective input will be printed.")
-c1 =  CapTouch()
-c1.setup_captouch()
-try:
-        c1.detect_captouch()
-except KeyboardInterrupt:
-        print("Ctrl + C was pressed. Terminating capacitive touch test and continuing...")
-
 
 """
 Bubble System Tests

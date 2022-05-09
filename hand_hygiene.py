@@ -235,9 +235,9 @@ class CapTouch: # handles use of the AT42QT1070 capacitive touch sensor
         global out1
         global out2
 
-        GPIO.setup(out0, GPIO.IN, pull_up_down = GPIO.PUD_DOWN) # configure resistor on pin as pulldown
-        GPIO.setup(out1, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-        GPIO.setup(out2, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+        GPIO.setup(out0, GPIO.IN, pull_up_down = GPIO.PUD_UP) # configure resistor on pin as pullup
+        GPIO.setup(out1, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+        GPIO.setup(out2, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
     def out0_cb(self, pin): # handle touch detection on first capacitive input
         print("First capacitive input touch detected")

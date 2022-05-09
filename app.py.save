@@ -1,0 +1,52 @@
+#app.py
+#Implement application and user interface logic here
+#Imports hand-hygiene.py and uses its library functions
+
+import threading
+import time
+import os
+
+import digitalio
+import board
+import sys
+
+import RPi.GPIO as GPIO
+
+import hand_hygiene
+
+GPIO.setmode(GPIO.BCM)
+
+"""
+Tasks that run once
+"""
+
+lcd1 = LCD()
+lcd1.setup_display()
+lcd1.clear_display()
+
+ct1 = CapTouch()
+ct1.setup_captouch()
+
+speaker = Speaker() # initializing a new speaker object also sets it up
+
+b1 = Bubbles()
+b1.setup_bubbles()
+
+f1 = FlowSensor()
+f1.setup_water_flow_sensor()
+
+#TODO: run Flask web UI server
+
+"""
+Background Tasks That Run Always
+"""
+#TODO: running counter for flow sensor
+#TODO: read capacitive touch sensor inputs and do actions as needed
+#TODO: monitor flask server input and sync with device settings
+
+if __name__ == "__main__":
+    # one time tasks
+    simple_GPIO_setup()
+    peripheral_setup()
+
+    # backgro
