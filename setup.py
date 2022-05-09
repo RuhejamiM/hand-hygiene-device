@@ -7,7 +7,7 @@ setup(name='hand_hygiene',
       author_email=['eb3326@nyu.edu', 'rm4966@nyu.edu']
       url='https://github.com/RuhejamiM/hand-hygiene-device',
       install_requires=[],
-	  py_modules=['hand-hygiene'],
+	  py_modules=['hand_hygiene'],
      )
 
 # install_requires=['pygame>=2.1.2', 'adafruit-circuitpython-rgb-display', 'fonts-dejavu', 'python3-pil'] (move back to setup after testing is complete)
