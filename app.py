@@ -123,7 +123,23 @@ def detect_button():
 	GPIO.add_event_detect(out1, GPIO.FALLING, callback = scroll_button, bouncetime = 200)
 	GPIO.add_event_detect(out2, GPIO.FALLING, callback = select_button, bouncetime = 200)
 
+def web_server_setup():
+        # function that will setup the framework for the Flask server and have access to latest analytical data
+        global app
+        app = Flask(__name__, static_folder='assets')
 
+        @app.route("/")
+        def home():
+                return redirect("/templates/index")
+
+        @app.route("/templates/index")
+        def home_template():
+                return render_template("index.html")
+
+        @app.route("/templates/statistics")
+        def stats_template():
+                # set frequency and duration elsewhere
+                return render_template("statistics.html", frequency=freq, duration=dur)
 
 """
 Background Tasks That Run Always
@@ -215,26 +231,9 @@ def interface():
 						speaker.stop_sound()
 				# select button pressed; will loop back to clear display and wait for settings button to be pressed again or for water to start
 
-def web_server():
-	# function that will start Flask server have access to latest analytical data
-
-	app = Flask(__name__, static_folder='assets')
-
-	@app.route("/")
-	def home():
-		return redirect("/templates/index")
-
-	@app.route("/templates/index")
-	def home_template():
-		return render_template("index.html")
-
-	@app.route("/templates/statistics")
-	def stats_template():
-		# set frequency and duration elsewhere
-		return render_template("statistics.html", frequency=freq, duration=dur)
-
-	app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
-
+def flask_server_start():
+	# start flask server; this will be run threaded so it is not blocking
+	app.run(host ='0.0.0.0', port=5000, debug=True, use_reloader=False) # use a high port (e.g, 5000) since port 80 (default) is privileged and needs sudo to run
 
 def reset_stats():
 	global freq
@@ -254,15 +253,15 @@ if __name__ == "__main__": # main function; this runs when program is called
 	# one time tasks
 	setup_GPIO()
 	setup_parts()
-	web_server()
-	time.sleep(6) # let web server start before continuing
+	web_server_setup()
+
 	detect_flow()
 	detect_button()
 
 	time.sleep(2) # allow water flow to be registered by sensor
 
 	# background tasks
-	background_tasks = [water_is_running, interface, reset_stats]
+	background_tasks = [water_is_running, interface, reset_stats, flask_server_start]
 
 	# start background tasks with threading
 	for task in background_tasks:
@@ -273,8 +272,8 @@ if __name__ == "__main__": # main function; this runs when program is called
 			time.sleep(1)
 	except KeyboardInterrupt:
 		print("Cleaning up GPIO and quitting...")
+		GPIO.remove_event_detect(out0)
+		GPIO.remove_event_detect(out1)
+		GPIO.remove_event_detect(out2)
+		GPIO.remove_event_detect(water_flow_pin)
 		GPIO.cleanup()
-
-
-# settings menu can be changed only when the water is off; button does nothing otherwise
-# turn the faucet on > start timing and immediately start bubble system > provide audio guidance at each stage
